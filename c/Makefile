@@ -6,10 +6,10 @@ TARGETS = demo
 all: $(TARGETS)
 
 demo: demo.o niusb6501.o
-	$(CC) -lusb -o $@ $+
+	$(CC) -g -o $@ $+ -lusb-1.0
 
 %.o: %.c
-	$(CC) -O3 -o $@ -c $<
+	$(CC) -g -o $@ -c $<
 
 clean:
 	$(RM) *.o $(TARGETS)

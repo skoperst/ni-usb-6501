@@ -6,7 +6,7 @@
 
 #include "niusb6501.h"
 
-void counter_demo(struct usb_dev_handle *handle)
+void counter_demo(struct libusb_device_handle *handle)
 {
 	niusb6501_write_counter(handle, 0);
 	niusb6501_start_counter(handle);
@@ -25,7 +25,7 @@ void counter_demo(struct usb_dev_handle *handle)
 			break;
 		}
 
-		printf("\e[1ACOUNTER: %08x\n", value);
+        printf("\e[1ACOUNTER: %08lx\n", value);
 
 		usleep(200*1000);
 	}
@@ -42,7 +42,7 @@ void char_to_bin(unsigned char value, char *buffer)
 	buffer[8] = '\0';
 }
 
-void read_port_demo(struct usb_dev_handle *handle)
+void read_port_demo(struct libusb_device_handle *handle)
 {
 	niusb6501_set_io_mode(handle, 0x00, 0x00, 0x00);
 
@@ -84,7 +84,7 @@ void read_port_demo(struct usb_dev_handle *handle)
 	}
 }
 
-void write_port_demo(struct usb_dev_handle *handle)
+void write_port_demo(struct libusb_device_handle *handle)
 {
 	unsigned long value = 0x000000ff;
 
@@ -149,8 +149,9 @@ void print_usage(const char *progname)
 
 int main(int argc, char **argv)
 {
-	struct usb_device *dev;
-	struct usb_dev_handle *handle;
+    struct libusb_device *dev;
+    struct libusb_device_handle *handle;
+    int devCount = 0;
 	char mode = 'h';
 
 	if(argc == 2 && argv[1][0] == '-' && argv[1][1] && !argv[1][2])
@@ -168,9 +169,13 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	if(niusb6501_list_devices(&dev, 1) != 1)
+    devCount = niusb6501_list_devices(&dev, 1, NULL);
+    if(devCount != 1)
 	{
-		fprintf(stderr, "Device not found\n");
+        if (devCount == 0)
+            fprintf(stderr, "Device not found\n");
+        else
+            fprintf(stderr, "More than one device not found\n");
 		return ENODEV;
 	}
 
