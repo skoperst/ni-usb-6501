@@ -5,7 +5,7 @@
 
 extern size_t niusb6501_list_devices(struct libusb_device *devices[], size_t size, const char *serial);
 extern struct libusb_device_handle *niusb6501_open_device(libusb_device *device);
-extern int niusb6501_close_device(struct libusb_device_handle *handle);
+extern void niusb6501_close_device(struct libusb_device_handle *handle);
 
 extern int niusb6501_start_counter(struct libusb_device_handle *handle);
 extern int niusb6501_stop_counter(struct libusb_device_handle *handle);

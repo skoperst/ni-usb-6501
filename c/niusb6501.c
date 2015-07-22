@@ -264,12 +264,9 @@ struct libusb_device_handle *niusb6501_open_device(struct libusb_device *device)
  * PARAMS:
  * handle	handle of the device
  *
- * RETURNS:
- * 0 on success
- * <0 on error
  */
 
-int niusb6501_close_device(struct libusb_device_handle *handle)
+void niusb6501_close_device(struct libusb_device_handle *handle)
 {
     libusb_close(handle);
 }
