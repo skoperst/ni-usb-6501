@@ -279,7 +279,7 @@ void niusb6501_close_device(struct libusb_device_handle *handle)
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_start_counter(libusb_device_handle *handle)
@@ -290,9 +290,10 @@ int niusb6501_start_counter(libusb_device_handle *handle)
     int status;
 
     status = niusb6501_send_request(handle, 0x09, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if (status != LIBUSB_SUCCESS)
         return status;
-    if(!niusb6501_is_success(result_len, result))
+
+    if (!niusb6501_is_success(result_len, result))
         return PROTOCOL_ERROR;
     return 0;
 }
@@ -305,7 +306,7 @@ int niusb6501_start_counter(libusb_device_handle *handle)
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_stop_counter(struct libusb_device_handle *handle)
@@ -316,8 +317,9 @@ int niusb6501_stop_counter(struct libusb_device_handle *handle)
     int status;
 
     status = niusb6501_send_request(handle, 0x0c, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if(status != LIBUSB_SUCCESS)
         return status;
+
     if(!niusb6501_is_success(result_len, result))
         return PROTOCOL_ERROR;
     return 0;
@@ -335,7 +337,7 @@ int niusb6501_stop_counter(struct libusb_device_handle *handle)
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_read_port(struct libusb_device_handle *handle, unsigned char port, unsigned char *value)
@@ -348,9 +350,10 @@ int niusb6501_read_port(struct libusb_device_handle *handle, unsigned char port,
     request[6] = port;
 
     status = niusb6501_send_request(handle, 0x0e, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if (status != LIBUSB_SUCCESS)
         return status;
-    if(!niusb6501_packet_matches(result_len, result, 12, "\x00\x0c\x01\x00\x00\x00\x00\x02\x00\x03\x00\x00", "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\xff"))
+
+    if (!niusb6501_packet_matches(result_len, result, 12, "\x00\x0c\x01\x00\x00\x00\x00\x02\x00\x03\x00\x00", "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\xff"))
         return PROTOCOL_ERROR;
 
     *value = result[10];
@@ -369,7 +372,7 @@ int niusb6501_read_port(struct libusb_device_handle *handle, unsigned char port,
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_read_counter(struct libusb_device_handle *handle, unsigned long *value)
@@ -380,10 +383,10 @@ int niusb6501_read_counter(struct libusb_device_handle *handle, unsigned long *v
     int status;
 
     status = niusb6501_send_request(handle, 0x0e, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if (status != LIBUSB_SUCCESS)
         return status;
 
-    if(!niusb6501_packet_matches(result_len, result, 12, "\x00\x0c\x01\x00\x00\x00\x00\x02\x00\x00\x00\x00", "\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00"))
+    if (!niusb6501_packet_matches(result_len, result, 12, "\x00\x0c\x01\x00\x00\x00\x00\x02\x00\x00\x00\x00", "\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00"))
         return PROTOCOL_ERROR;
 
     *value = (result[8] << 24) | (result[9] << 16) | (result[10] << 8) | result[11];
@@ -403,7 +406,7 @@ int niusb6501_read_counter(struct libusb_device_handle *handle, unsigned long *v
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_write_port(struct libusb_device_handle *handle, unsigned char port, unsigned char value)
@@ -417,9 +420,10 @@ int niusb6501_write_port(struct libusb_device_handle *handle, unsigned char port
     request[9] = value;
 
     status = niusb6501_send_request(handle, 0x0f, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if (status != LIBUSB_SUCCESS)
         return status;
-    if(!niusb6501_is_success(result_len, result))
+
+    if (!niusb6501_is_success(result_len, result))
         return PROTOCOL_ERROR;
     return 0;
 }
@@ -435,7 +439,7 @@ int niusb6501_write_port(struct libusb_device_handle *handle, unsigned char port
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_write_counter(struct libusb_device_handle *handle, unsigned long value)
@@ -451,9 +455,10 @@ int niusb6501_write_counter(struct libusb_device_handle *handle, unsigned long v
     request[7] = value         & 0xff;
 
     status = niusb6501_send_request(handle, 0x0f, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if (status != LIBUSB_SUCCESS)
         return status;
-    if(!niusb6501_is_success(result_len, result))
+
+    if (!niusb6501_is_success(result_len, result))
         return PROTOCOL_ERROR;
     return 0;
 }
@@ -471,7 +476,7 @@ int niusb6501_write_counter(struct libusb_device_handle *handle, unsigned long v
  *
  * RETURNS:
  * 0 on success
- * <0 on error
+ * libusb_error on transfer error or -EPROTO on protocol error
  */
 
 int niusb6501_set_io_mode(struct libusb_device_handle *handle, unsigned char port0, unsigned char port1, unsigned char port2)
@@ -486,9 +491,10 @@ int niusb6501_set_io_mode(struct libusb_device_handle *handle, unsigned char por
     request[8] = port2;
 
     status = niusb6501_send_request(handle, 0x12, sizeof request, request, &result_len, result);
-    if(status < 0)
+    if (status != LIBUSB_SUCCESS)
         return status;
-    if(!niusb6501_is_success(result_len, result))
+
+    if (!niusb6501_is_success(result_len, result))
         return PROTOCOL_ERROR;
     return 0;
 }
