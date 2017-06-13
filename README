@@ -7,3 +7,11 @@ The result can be found in the directory c/.
 
 For further details, have a look at doc/documentation.html.
 
+
+
+NI USB-6218 is also a digital IO module for USB, it shared the command structure 
+of the NI USB-6501,  however it is based on FPGA module which need to be programmed 
+before every use.
+Once started it will listen in 'bootloader' mode, and after programming it will
+shut down USB and reconnect as the USB-6218 module.
+
